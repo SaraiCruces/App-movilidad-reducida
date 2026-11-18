@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Vidix · Movilidad accesible</title>
+<style>
+:root{--bg:#f3f9fb;--cd:#fff;--tx:#0b2540;--mu:#44566c;--pr:#0b5cad;--gr:#0f7a58;--wa:#a8480a;--rd:#b42318;--bd:#c9d9e5;--ac:#e3f1fb;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0b1a2a;--cd:#12263a;--tx:#eaf3fb;--mu:#a9bccd;--pr:#7cbcff;--gr:#4fd1a1;--wa:#fbbf24;--rd:#ff8a80;--bd:#27425b;--ac:#16324b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0b1a2a;--cd:#12263a;--tx:#eaf3fb;--mu:#a9bccd;--pr:#7cbcff;--gr:#4fd1a1;--wa:#fbbf24;--rd:#ff8a80;--bd:#27425b;--ac:#16324b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:17px/1.55 system-ui,"Segoe UI",Arial,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;padding:12px 20px;background:var(--cd);border-bottom:2px solid var(--bd)}
+.logo{font-size:1.7rem;font-weight:800;color:var(--pr)}.logo span{color:var(--gr)}
+nav{display:flex;flex-wrap:wrap;gap:6px;padding:10px 20px;background:var(--cd);border-bottom:1px solid var(--bd)}
+nav button,.btn{min-height:44px;padding:8px 14px;border:2px solid var(--bd);border-radius:10px;background:var(--cd);color:var(--tx);font:inherit;font-weight:600;cursor:pointer}
+nav button[aria-selected="true"],.btn{background:var(--pr);border-color:var(--pr);color:#fff}
+:root:not([data-theme="light"]) nav button[aria-selected="true"],:root:not([data-theme="light"]) .btn{color:#06121f}
+.btn.alt{background:var(--cd);color:var(--pr)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+main{max-width:1100px;margin:auto;padding:20px}
+section[hidden]{display:none}
+h1{font-size:2.2rem;line-height:1.15;margin:.2em 0}h2{margin:.2em 0 .6em}h3{margin:.2em 0}
+.hero{background:linear-gradient(135deg,var(--ac),var(--cd));border:2px solid var(--bd);border-radius:18px;padding:28px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.card{background:var(--cd);border:2px solid var(--bd);border-radius:14px;padding:16px;transition:transform .2s}
+.anim .card:hover{transform:translateY(-3px)}
+.kpi b{display:block;font-size:2rem;color:var(--pr)}
+.mu{color:var(--mu)}
+label{display:block;font-weight:600;margin:10px 0 4px}
+input,select,textarea{width:100%;min-height:44px;padding:8px 10px;border:2px solid var(--bd);border-radius:8px;background:var(--bg);color:var(--tx);font:inherit}
+input[type=checkbox]{width:22px;min-height:22px;vertical-align:middle}
+.row{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));align-items:end}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-weight:700;font-size:.85rem;border:2px solid currentColor}
+.hi{color:var(--gr)}.me{color:var(--wa)}.lo{color:var(--rd)}
+.err{color:var(--rd);font-weight:700}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%}th,td{text-align:left;padding:8px;border-bottom:1px solid var(--bd)}
+.route{cursor:pointer}.route[aria-pressed="true"]{border-color:var(--pr);box-shadow:0 0 0 3px var(--ac)}
+.bar{height:12px;border-radius:6px;background:var(--bd);overflow:hidden}.bar i{display:block;height:100%;background:var(--gr)}
+footer{text-align:center;padding:24px;color:var(--mu);border-top:2px solid var(--bd);margin-top:30px}
+svg text{fill:var(--tx);font:13px system-ui}
+.anim *{transition:all .25s}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body class="anim">
+<header><div class="logo" aria-label="Vidix">Vi<span>dix</span></div>
+<label style="margin:0;display:flex;gap:8px;align-items:center"><input type="checkbox" id="mo" checked> Animaciones</label></header>
+<nav role="tablist" aria-label="Secciones" id="nav"></nav>
+<main id="main"></main>
+<footer>Vidix · Prototipo académico con datos ficticios. No representa un sistema de transporte real.</footer>
+<script>
+const $=(s,r=document)=>r.querySelector(s),esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* ---- Datos simulados ---- */
+const S=[
+{n:"Jacarandas",x:70,y:70,el:"ok",ra:1,pl:1,sf:"Liso",rel:92,rep:2,d:3},
+{n:"Plaza del Sol",x:250,y:60,el:"ok",ra:1,pl:1,sf:"Liso",rel:88,rep:1,d:5},
+{n:"Mercado Norte",x:430,y:90,el:"out",ra:1,pl:0,sf:"Adoquín",rel:61,rep:7,d:41},
+{n:"Universidad Sur",x:620,y:80,el:"ok",ra:0,pl:1,sf:"Mixto",rel:74,rep:3,d:20},
+{n:"Centro Cívico",x:600,y:250,el:"ok",ra:1,pl:1,sf:"Liso",rel:95,rep:0,d:2},
+{n:"Parque Lirios",x:340,y:190,el:"none",ra:1,pl:0,sf:"Mixto",rel:55,rep:4,d:35},
+{n:"Colonia Nogales",x:90,y:240,el:"out",ra:0,pl:0,sf:"Adoquín",rel:48,rep:9,d:60},
+{n:"Terminal Poniente",x:330,y:300,el:"ok",ra:1,pl:1,sf:"Liso",rel:81,rep:2,d:9}];
+const E=[[0,1,8,60],[1,2,6,120],[2,3,7,90],[3,4,9,50],[1,5,5,200],[5,4,6,180],[0,6,10,250],[6,7,7,150],[7,4,8,70],[2,7,6,140]];
+const acc=s=>(s.el=="ok"?40:s.el=="none"?10:0)+(s.ra?20:0)+(s.pl?20:0)+({Liso:10,Mixto:5,"Adoquín":0}[s.sf])+s.rel/10;
+const lvl=v=>v>=75?["Alta","hi","#0f7a58"]:v>=55?["Media","me","#d97706"]:["Baja","lo","#d92d20"];
+const edge=(a,b)=>E.find(e=>(e[0]==a&&e[1]==b)||(e[0]==b&&e[1]==a));
+/* Recomendación: DFS de rutas simples y puntuación de accesibilidad (simula modelo en Vertex AI) */
+function plan(o,d,h){const out=[];(function go(p){const u=p.at(-1);if(u==d){out.push([...p]);return}
+ for(const e of E){const v=e[0]==u?e[1]:e[1]==u?e[0]:-1;if(v>=0&&!p.includes(v)&&p.length<6)go([...p,v])}})([o]);
+ const pk=(h>=7&&h<9)||(h>=17&&h<19);
+ return out.map(p=>{let t=0,w=0;for(let i=1;i<p.length;i++){const e=edge(p[i-1],p[i]);t+=e[2];w+=e[3]}
+  const st=p.map(i=>S[i]),av=st.reduce((a,s)=>a+acc(s),0)/st.length,bad=st.filter(s=>s.el=="out").length;
+  const sc=Math.max(0,Math.min(100,Math.round(av-bad*15-w/40)));
+  return{p,t:Math.round(t*(pk?1.3:1)),w,sc,bad,rel:Math.round(st.reduce((a,s)=>a+s.rel,0)/st.length),pk}}).sort((a,b)=>b.sc-a.sc||a.t-b.t).slice(0,3)}
+let sel=null;
+const R=[{t:"Elevador fuera de servicio",s:2,txt:"Elevador sin funcionar desde la mañana.",v:"Verificado",c:94},{t:"Rampa obstruida",s:5,txt:"Puesto ambulante bloquea la rampa.",v:"En revisión",c:68},{t:"Banqueta rota",s:6,txt:"Hueco profundo en la salida.",v:"Verificado",c:89},{t:"Elevador fuera de servicio",s:6,txt:"Falla recurrente, tercer reporte.",v:"Pendiente",c:0}];
+const REG=S.slice(0,4).map(s=>({n:s.n,tp:"Estación",el:s.el=="ok"?"Operativo":s.el=="out"?"Fuera de servicio":"No tiene",ra:s.ra,pl:s.pl,sf:s.sf}));
+const wk=["L","M","X","J","V","S","D"],mn=["Jun","Jul","Ago","Sep","Oct","Nov"];
+const W={viajes:[320,350,410,390,430,260,210],rutas:[180,190,230,210,240,150,120],rep:[12,9,15,11,14,6,5],res:[7,6,11,8,10,5,4]};
+const M={viajes:[5200,5900,6400,7100,7800,8300],rutas:[2800,3100,3500,3900,4200,4600],rep:[160,170,150,190,175,160],res:[90,115,120,150,150,140]};
+/* ---- Gráficas SVG ---- */
+function chart(lb,ser,title){const W0=520,H=210,mx=Math.max(...ser.flatMap(s=>s[1])),g=W0/lb.length,bw=Math.min(28,(g-10)/ser.length);
+ let o=`<svg viewBox="0 0 ${W0} ${H+30}" role="img" aria-label="${esc(title)}: ${ser.map(s=>s[0]+" "+s[1].join(", ")).join("; ")}" width="100%">`;
+ lb.forEach((l,i)=>{ser.forEach((s,j)=>{const h=s[1][i]/mx*H,x=i*g+(g-bw*ser.length)/2+j*bw;o+=`<rect x="${x}" y="${H-h}" width="${bw-2}" height="${h}" rx="3" fill="${s[2]}"/>`});o+=`<text x="${i*g+g/2}" y="${H+18}" text-anchor="middle">${l}</text>`});
+ return o+`</svg><p class="mu" style="margin:0">${ser.map(s=>`<span style="color:${s[2]}">■</span> ${s[0]}`).join(" &nbsp; ")}</p>`}
+const per=sel=>sel=="s"?[wk,W]:[mn,M];
+/* ---- Mapa SVG ---- */
+function map(){let o=`<svg viewBox="0 0 720 340" role="img" aria-label="Mapa simulado de ${S.length} estaciones coloreadas por nivel de accesibilidad" width="100%" style="background:var(--ac);border-radius:12px">`;
+ const hl=sel?sel.p:[];
+ E.forEach(e=>{const a=S[e[0]],b=S[e[1]],on=hl.includes(e[0])&&hl.includes(e[1])&&Math.abs(hl.indexOf(e[0])-hl.indexOf(e[1]))==1;o+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="${on?'#0b5cad':'#8aa4ba'}" stroke-width="${on?7:3}" ${on?'':'stroke-dasharray="6 5"'}/>`});
+ S.forEach(s=>{const l=lvl(acc(s));o+=`<circle cx="${s.x}" cy="${s.y}" r="15" fill="${l[2]}" stroke="#fff" stroke-width="3"><title>${s.n}: accesibilidad ${l[0]}</title></circle><text x="${s.x}" y="${s.y+32}" text-anchor="middle">${s.n}</text>`});
+ return o+`</svg><p class="mu">Verde: accesibilidad alta · Ámbar: media · Rojo: baja. La ruta elegida se resalta en azul grueso.</p>`}
+/* ---- Voz (Speech-to-Text simulado) ---- */
+function voice(cb,out){const SR=window.SpeechRecognition||window.webkitSpeechRecognition,say=t=>{$(out).textContent="Escuché: “"+t+"”";const f=S.map((s,i)=>[t.toLowerCase().indexOf(s.n.toLowerCase()),i]).filter(a=>a[0]>=0).sort((a,b)=>a[0]-b[0]);if(f.length>1)cb(f[0][1],f[1][1]);else $(out).textContent+=" · No identifiqué dos estaciones."};
+ if(SR){try{const r=new SR();r.lang="es-MX";r.onresult=e=>say(e.results[0][0].transcript);r.onerror=()=>say("de Jacarandas a Centro Cívico");r.start();$(out).textContent="Escuchando…";return}catch(e){}}
+ say("de Jacarandas a Centro Cívico (dictado simulado)")}
+const opts=(i)=>S.map((s,k)=>`<option value="${k}" ${k==i?"selected":""}>${s.n}</option>`).join("");
+const routeCards=rs=>rs.map((r,i)=>{const l=lvl(r.sc);return`<button class="card route" style="text-align:left;width:100%;color:inherit;font:inherit" data-i="${i}" aria-pressed="${sel==r}"><b>Opción ${i+1}${i?"":" · Más accesible"}</b> <span class="badge ${l[1]}">${l[0]} · ${r.sc}/100</span><br>${r.p.map(k=>S[k].n).join(" → ")}<br><span class="mu">${r.t} min · ${r.w} m a pie · confiabilidad del dato ${r.rel}%${r.bad?" · ⚠ "+r.bad+" elevador(es) fuera de servicio":""}${r.pk?" · hora pico":""}</span></button>`}).join("");
+/* ---- Secciones ---- */
+const hh=(t,s)=>`<h2>${t}</h2><p class="mu">${s}</p>`;
+const T={
+inicio:["Inicio",()=>`<div class="hero"><h1>Cada trayecto, accesible. Cada dato, confiable.</h1><p>Vidix planea rutas priorizando elevadores, rampas y andenes accesibles sobre la rapidez, y verifica los reportes de la comunidad con datos e IA.</p><button class="btn" data-go="planeador">Planear una ruta</button></div><div class="grid" style="margin-top:14px"><div class="card"><h3>El problema</h3><p>Las apps muestran rutas, pero no si hay elevador, rampa o plataforma accesible. La información falta o está desactualizada.</p></div><div class="card"><h3>La solución</h3><p>Rutas ordenadas por una puntuación de accesibilidad, reportes comunitarios verificados con imagen y alertas de fallas.</p></div><div class="card"><h3>El impacto</h3><p>Viajes más seguros para usuarios de silla de ruedas, familiares y cuidadores, y datos útiles para coordinadores.</p></div></div>`],
+dashboard:["Dashboard",()=>{const[l,d]=per(window.pd||"s");return hh("Dashboard","KPIs simulados (datos ficticios).")+`<div class="grid">${[["Rutas accesibles disponibles","1,284"],["Reportes verificados","342"],["Estaciones con elevador operativo",S.filter(s=>s.el=="ok").length+" de "+S.length],["Viajes planeados","8,320"],["Usuarios activos","1,240"]].map(k=>`<div class="card kpi"><b>${k[1]}</b>${k[0]}</div>`).join("")}</div><div class="card" style="margin-top:14px"><label for="pd">Periodo</label><select id="pd"><option value="s">Semanal</option><option value="m" ${window.pd=="m"?"selected":""}>Mensual</option></select>${chart(l,[["Viajes planeados",d.viajes,"#0b5cad"],["Rutas accesibles",d.rutas,"#12a77a"]],"Viajes y rutas accesibles")}</div>`}],
+barreras:["Barreras y rutas",()=>hh("Registro de barreras y rutas","Registra estaciones, paradas o rutas con sus características de accesibilidad.")+`<div class="card"><form id="fr" novalidate><div class="row"><div><label for="rn">Nombre</label><input id="rn" required minlength="3"></div><div><label for="rt">Tipo</label><select id="rt"><option>Estación</option><option>Parada</option><option>Ruta</option></select></div><div><label for="re">Elevador</label><select id="re"><option>Operativo</option><option>Fuera de servicio</option><option>No tiene</option></select></div><div><label for="rs">Superficie</label><select id="rs"><option>Liso</option><option>Mixto</option><option>Adoquín</option></select></div></div><label><input type="checkbox" id="rr"> Tiene rampa</label><label><input type="checkbox" id="rp"> Andén accesible</label><p class="err" id="rerr" role="alert"></p><button class="btn">Guardar registro</button></form></div><div class="card scroll" style="margin-top:14px"><table><caption class="mu" style="text-align:left">Registros (${REG.length})</caption><tr><th>Nombre</th><th>Tipo</th><th>Elevador</th><th>Rampa</th><th>Andén</th><th>Superficie</th></tr>${REG.map(r=>`<tr><td>${esc(r.n)}</td><td>${r.tp}</td><td>${r.el}</td><td>${r.ra?"Sí":"No"}</td><td>${r.pl?"Sí":"No"}</td><td>${r.sf}</td></tr>`).join("")}</table></div>`],
+planeador:["Planeador",()=>hh("Planeador de ruta accesible","La puntuación combina elevadores, rampas, andén, superficie, distancia a pie y confiabilidad del dato.")+`<div class="card"><div class="row"><div><label for="po">Origen</label><select id="po">${opts(window.po??0)}</select></div><div><label for="pdst">Destino</label><select id="pdst">${opts(window.pdt??4)}</select></div><div><label for="ph">Horario</label><input type="time" id="ph" value="${window.ph||"08:00"}"></div><button class="btn" id="pgo">Calcular</button></div></div><div id="pres" style="display:grid;gap:10px;margin-top:14px"></div>`],
+mapa:["Mapa",()=>hh("Mapa visual simulado","Componente SVG propio; sustituye a Maps API en el MVP.")+`<div class="card">${map()}</div>`],
+reportes:["Reportes",()=>hh("Reportes comunitarios","La verificación por imagen es simulada (Vision API).")+`<div class="card"><form id="fq"><div class="row"><div><label for="qt">Tipo de barrera</label><select id="qt"><option>Elevador fuera de servicio</option><option>Banqueta rota</option><option>Rampa obstruida</option></select></div><div><label for="qs">Estación</label><select id="qs">${opts(0)}</select></div><div><label for="qf">Foto (simulada)</label><input type="file" id="qf" accept="image/*"></div></div><label for="qd">Descripción</label><textarea id="qd" required></textarea><p class="err" id="qerr" role="alert"></p><button class="btn">Enviar reporte</button></form></div><div class="card" style="margin-top:14px"><label for="qfl">Filtrar por estado</label><select id="qfl"><option value="">Todos</option><option>Verificado</option><option>En revisión</option><option>Pendiente</option></select><div id="ql"></div></div>`],
+impacto:["Impacto",()=>{const[l,d]=per(window.pi||"s");return hh("Impacto e inclusión","Barreras reportadas contra resueltas y rutas accesibles encontradas.")+`<div class="card"><label for="pi">Periodo</label><select id="pi"><option value="s">Semanal</option><option value="m" ${window.pi=="m"?"selected":""}>Mensual</option></select>${chart(l,[["Reportadas",d.rep,"#d97706"],["Resueltas",d.res,"#12a77a"],["Rutas accesibles",d.rutas.map(x=>x/ (window.pi=="m"?20:2)),"#0b5cad"]],"Impacto")}</div>`}],
+admin:["Coordinación",()=>{const z=[...S].sort((a,b)=>b.rep-a.rep).slice(0,4),st=S.filter(s=>s.d>30||s.rel<60);return hh("Panel de coordinador","Datos desactualizados, zonas críticas y alertas.")+`<div class="grid"><div class="card"><h3>Datos incompletos o desactualizados</h3>${st.map(s=>`<p>${s.n}: ${s.d} días sin actualizar · confiabilidad ${s.rel}%</p>`).join("")}</div><div class="card"><h3>Zonas con más reportes</h3>${z.map(s=>`<p>${s.n}: ${s.rep} reportes<div class="bar"><i style="width:${s.rep*10}%"></i></div></p>`).join("")}</div><div class="card"><h3>Alertas de elevadores</h3>${S.filter(s=>s.el=="out").map(s=>`<p class="lo">⚠ Elevador fuera de servicio en ${s.n}</p>`).join("")}<h3>Usuarios activos</h3><p class="kpi"><b>1,240</b></p></div></div>`}],
+ia:["IA aplicada",()=>{const top=plan(0,4,8),hrs=[6,7,8,9,10,11,12,13,14,15,16,17,18],sat=[30,70,95,80,45,35,40,45,40,50,65,90,75];return hh("IA aplicada","Cada ejemplo muestra una representación simulada.")+`<div class="grid"><div class="card"><h3>1. Recomendación de rutas</h3><p class="mu">Modelo (simulado) que ordena por accesibilidad.</p>${top.map((r,i)=>`<p>Opción ${i+1}: ${r.sc}/100<div class="bar"><i style="width:${r.sc}%"></i></div></p>`).join("")}</div><div class="card"><h3>2. Saturación de andenes accesibles</h3>${chart(hrs.map(h=>h),[["Ocupación prevista %",sat,"#0b5cad"]],"Predicción por hora")}</div><div class="card"><h3>3. Clasificación de estaciones</h3>${S.map(s=>{const l=lvl(acc(s));return`<p>${s.n} <span class="badge ${l[1]}">${l[0]}</span></p>`}).join("")}</div><div class="card"><h3>4. Verificación por imagen</h3><p class="mu">Vision API (simulada): ¿elevador fuera de servicio?</p><button class="btn alt" id="vi">Analizar foto de ejemplo</button><p id="vr" aria-live="polite"></p></div><div class="card"><h3>5. Generación de alertas</h3><p class="lo">⚠ Mercado Norte: 7 reportes y elevador fuera de servicio. Se recomienda evitar el andén 2 y usar Plaza del Sol → Parque Lirios.</p></div></div><div class="card scroll" style="margin-top:14px"><h3>Qué es funcional y qué es conceptual</h3><table><tr><th>Componente</th><th>En el MVP</th></tr><tr><td>Puntuación y orden de rutas</td><td>Funcional en simulación (JavaScript)</td></tr><tr><td>Voz</td><td>Funcional si el navegador soporta dictado; si no, simulada</td></tr><tr><td>Vision API, predicción, BigQuery</td><td>Simulados con datos mock</td></tr><tr><td>Cloud Run, Cloud SQL, Storage, IAM, Logging</td><td>Conceptuales</td></tr></table></div>`}],
+asistente:["Asistente",()=>hh("Asistente de ruta accesible","Indica origen, destino y horario, o dicta por voz.")+`<div class="card"><div class="row"><div><label for="ao">Origen</label><select id="ao">${opts(0)}</select></div><div><label for="ad">Destino</label><select id="ad">${opts(4)}</select></div><div><label for="ah">Horario</label><input type="time" id="ah" value="08:00"></div><button class="btn" id="ago">Recomendar</button><button class="btn alt" id="av">🎤 Dictar</button></div><p id="avo" aria-live="polite" class="mu"></p><p id="ar" aria-live="polite"></p></div>`],
+gcp:["Google Cloud",()=>hh("Arquitectura Google Cloud","Qué se simula y qué es conceptual en este MVP.")+`<div class="grid">${[["Cloud Run / App Engine","Aloja la aplicación web","Conceptual"],["Cloud SQL","Estaciones y rutas estructuradas","Simulado con data.js"],["Cloud Storage","Fotos de reportes","Simulado (carga local)"],["Maps API","Mapa de trayectos","Simulado (SVG propio)"],["Vertex AI / APIs de IA","Recomendación y predicción","Simulado (puntuación)"],["BigQuery","Patrones de fallas y demanda","Simulado (agregados)"],["Speech-to-Text","Dictado de origen y destino","Funcional si el navegador lo permite"],["Vision API","Verificación de fotos","Simulada"],["IAM / IAP","Acceso del coordinador","Conceptual"],["Logging / Monitoring","Observabilidad","Conceptual"]].map(g=>`<div class="card"><h3>${g[0]}</h3><p>${g[1]}</p><span class="badge ${g[2]=="Conceptual"?"me":"hi"}">${g[2]}</span></div>`).join("")}</div>`]};
+/* ---- Navegación ---- */
+const nav=$("#nav"),main=$("#main");let cur="inicio";
+Object.entries(T).forEach(([k,v])=>{const b=document.createElement("button");b.textContent=v[0];b.role="tab";b.dataset.k=k;b.onclick=()=>show(k);nav.append(b)});
+nav.onkeydown=e=>{const b=[...nav.children],i=b.indexOf(document.activeElement);if(e.key=="ArrowRight")b[(i+1)%b.length].focus();if(e.key=="ArrowLeft")b[(i+b.length-1)%b.length].focus()};
+function show(k){cur=k;[...nav.children].forEach(b=>b.setAttribute("aria-selected",b.dataset.k==k));main.innerHTML=`<section aria-label="${T[k][0]}">${T[k][1]()}</section>`;bind(k);scrollTo(0,0)}
+function bind(k){const q=s=>$(s,main);
+ main.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+ if(q("#pd"))q("#pd").onchange=e=>{window.pd=e.target.value;show("dashboard")};
+ if(q("#pi"))q("#pi").onchange=e=>{window.pi=e.target.value;show("impacto")};
+ if(k=="barreras")q("#fr").onsubmit=e=>{e.preventDefault();const n=q("#rn").value.trim();if(n.length<3){q("#rerr").textContent="El nombre debe tener al menos 3 caracteres.";q("#rn").focus();return}REG.unshift({n,tp:q("#rt").value,el:q("#re").value,ra:q("#rr").checked,pl:q("#rp").checked,sf:q("#rs").value});show("barreras")};
+ if(k=="planeador"){const go=()=>{window.po=+q("#po").value;window.pdt=+q("#pdst").value;window.ph=q("#ph").value;if(po==pdt){q("#pres").innerHTML='<p class="err" role="alert">Elige origen y destino distintos.</p>';return}
+  const rs=plan(po,pdt,+ph.split(":")[0]);sel=rs[0];q("#pres").innerHTML=routeCards(rs)+'<p class="mu">Selecciona una opción y revisa el mapa.</p>';q("#pres").querySelectorAll(".route").forEach(b=>b.onclick=()=>{sel=rs[b.dataset.i];q("#pres").innerHTML=routeCards(rs)+'<p class="mu">Ruta resaltada en la pestaña Mapa.</p>';bind2()});bind2()};
+  const bind2=()=>q("#pres").querySelectorAll(".route").forEach(b=>b.onclick=()=>{const rs=plan(po,pdt,+ph.split(":")[0]);sel=rs[b.dataset.i];q("#pres").innerHTML=routeCards(rs);bind2()});q("#pgo").onclick=go}
+ if(k=="reportes"){const draw=()=>{const f=q("#qfl").value;q("#ql").innerHTML=R.filter(r=>!f||r.v==f).map(r=>`<p><b>${r.t}</b> · ${S[r.s].n} <span class="badge ${r.v=="Verificado"?"hi":r.v=="Pendiente"?"lo":"me"}">${r.v}${r.c?" · "+r.c+"%":""}</span><br><span class="mu">${esc(r.txt)}</span></p>`).join("")||"<p>Sin resultados.</p>"};draw();q("#qfl").onchange=draw;
+  q("#fq").onsubmit=e=>{e.preventDefault();const d=q("#qd").value.trim();if(d.length<5){q("#qerr").textContent="Describe la barrera (mínimo 5 caracteres).";return}q("#qerr").textContent="";const c=q("#qf").files.length?70+d.length%25:0;R.unshift({t:q("#qt").value,s:+q("#qs").value,txt:d,v:c>85?"Verificado":c?"En revisión":"Pendiente",c});q("#qd").value="";draw()}}
+ if(k=="ia")q("#vi").onclick=()=>q("#vr").textContent="Resultado simulado: elevador con puertas cerradas y cartel “fuera de servicio”. Confianza 93%. Reporte verificado.";
+ if(k=="asistente"){const run=()=>{const o=+q("#ao").value,d=+q("#ad").value;if(o==d){q("#ar").innerHTML='<span class="err">Elige origen y destino distintos.</span>';return}const rs=plan(o,d,+q("#ah").value.split(":")[0]),a=rs[0],b=rs[1],l=lvl(a.sc);sel=a;
+  q("#ar").innerHTML=`<b>Te recomiendo: ${a.p.map(k=>S[k].n).join(" → ")}</b> (accesibilidad ${l[0].toLowerCase()}, ${a.sc}/100).<br>Tarda ${a.t} min y tiene ${a.w} m a pie. ${a.bad?"Ojo: incluye un elevador fuera de servicio.":"Todos los elevadores del trayecto están operativos."} ${b&&b.t<a.t?`Hay una opción ${a.t-b.t} min más rápida, pero con puntuación ${b.sc}/100, por eso no la recomiendo.`:""} ${a.pk?"Es hora pico: considera salir antes.":""}`};
+  q("#ago").onclick=run;q("#av").onclick=()=>voice((o,d)=>{q("#ao").value=o;q("#ad").value=d;run()},"#avo")}}
+$("#mo").onchange=e=>document.body.classList.toggle("anim",e.target.checked);
+show("inicio");
+</script></body></html>
